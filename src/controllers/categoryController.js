@@ -57,6 +57,8 @@ const updateCategory = asyncHandler(async (req, res) => {
   }
 
   const updatedCategory = await category.save();
+  await updatedCategory.populate('featuredProduct', 'name images price');
+  await updatedCategory.populate('parent', 'name');
   res.json(updatedCategory);
 });
 

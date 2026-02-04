@@ -5,7 +5,7 @@ const categorySchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
+      unique: false, // Changed from true to allow same name in different parents
     },
     slug: {
       type: String,
@@ -38,5 +38,8 @@ const categorySchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Compound index to ensure name is unique ONLY within the same parent
+categorySchema.index({ name: 1, parent: 1 }, { unique: true });
 
 module.exports = mongoose.model('Category', categorySchema);
