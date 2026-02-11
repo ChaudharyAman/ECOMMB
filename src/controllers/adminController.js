@@ -219,6 +219,40 @@ const createVendor = asyncHandler(async (req, res) => {
     res.status(201).json(populatedVendor);
 });
 
+// @desc    Get all approved products (Admin View - includes inactive)
+// @route   GET /api/admin/products/approved
+// @access  Private/Admin
+const getApprovedProducts = asyncHandler(async (req, res) => {
+    const { category, vendor, keyword } = req.query;
+    
+    // Base query: approved products
+    // Note: We intentionally do NOT filter by isActive: true to show disabled products
+    let query = { status: 'approved' };
+    
+    if (category) {
+        query.category = category;
+    }
+    
+    if (vendor) {
+        query.vendor = vendor;
+    }
+
+    if (keyword) {
+        query.name = { $regex: keyword, $options: 'i' };
+    }
+  
+    // Fetch all for now (infinite scroll/large list)
+    // In future: Implement proper pagination
+    const products = await Product.find(query)
+      .populate('vendor', 'storeName')
+      .populate('category', 'name')
+      .sort({ updatedAt: -1 })
+      .limit(1000); // High limit to see "all" products
+      
+    console.log(`[DEBUG] Found ${products.length} approved products (Admin View)`);
+    res.json(products);
+});
+
 module.exports = {
   getVendors,
   createVendor,
@@ -228,4 +262,5 @@ module.exports = {
   getModerationQueue,
   approveProduct,
   rejectProduct,
+  getApprovedProducts,
 };

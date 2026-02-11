@@ -9,6 +9,7 @@ const {
   getVendors,
   createVendor,
   updateVendor,
+  getApprovedProducts,
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -23,5 +24,6 @@ router.put('/vendors/:id/reject', rejectVendor);
 router.get('/products/pending', getModerationQueue);
 router.put('/products/:id/approve', approveProduct);
 router.put('/products/:id/reject', rejectProduct);
+router.get('/products/approved', getApprovedProducts);
 
 module.exports = router;
