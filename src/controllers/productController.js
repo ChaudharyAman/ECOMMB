@@ -22,9 +22,17 @@ const getProducts = asyncHandler(async (req, res) => {
     }
   }
 
-  // Category filter
+  // Category filter (including subcategories)
   if (req.query.category) {
-    query.category = req.query.category;
+    const Category = require('../models/Category');
+    const categoryId = req.query.category;
+    
+    // Find all subcategories
+    const subCategories = await Category.find({ parent: categoryId }).select('_id');
+    const subCategoryIds = subCategories.map(c => c._id);
+    
+    // Query for products in the main category OR any of its subcategories
+    query.category = { $in: [categoryId, ...subCategoryIds] };
   }
 
   // Vendor filter
