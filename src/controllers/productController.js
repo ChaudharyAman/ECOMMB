@@ -6,7 +6,8 @@ const Vendor = require('../models/Vendor');
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-  const pageSize = 10;
+  // Allow dynamic page size, default to 10 if not provided or invalid
+  const pageSize = Number(req.query.limit) || 10;
   const page = Number(req.query.pageNumber) || 1;
 
   // Build query object
