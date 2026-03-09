@@ -19,11 +19,24 @@ const categorySchema = mongoose.Schema(
     image: {
       type: String,
     },
+    promoImage: {
+      type: String,
+    },
     isActive: {
       type: Boolean,
       default: true,
     },
     isFeatured: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    isOccasion: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    isPromo: {
       type: Boolean,
       default: false,
       index: true,

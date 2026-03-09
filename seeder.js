@@ -24,26 +24,28 @@ const importData = async () => {
     console.log('Data destroyed...');
 
     // Create Users
-    const createdUsers = await User.insertMany([
-      {
-        name: 'Admin User',
-        phone: '9999999999',
-        email: 'admin@example.com',
-        role: 'admin',
-      },
-      {
-        name: 'Vendor User',
-        phone: '8888888888',
-        email: 'vendor@example.com',
-        role: 'vendor',
-      },
-      {
-        name: 'Customer User',
-        phone: '7777777777',
-        email: 'user@example.com',
-        role: 'user',
-      },
-    ]);
+    const createdUsers = [];
+    createdUsers.push(await User.create({
+      name: 'Admin User',
+      phone: '9999999999',
+      email: 'admin@example.com',
+      password: 'password123',
+      role: 'admin',
+    }));
+    createdUsers.push(await User.create({
+      name: 'Vendor User',
+      phone: '8888888888',
+      email: 'vendor@example.com',
+      password: 'password123',
+      role: 'vendor',
+    }));
+    createdUsers.push(await User.create({
+      name: 'Customer User',
+      phone: '7777777777',
+      email: 'user@example.com',
+      password: 'password123',
+      role: 'user',
+    }));
 
     const adminUser = createdUsers[0];
     const vendorUser = createdUsers[1];

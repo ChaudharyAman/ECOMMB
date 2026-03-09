@@ -5,7 +5,7 @@ const Category = require('../models/Category');
 // @route   POST /api/categories
 // @access  Private/Admin
 const createCategory = asyncHandler(async (req, res) => {
-  const { name, parent, image } = req.body;
+  const { name, parent, image, promoImage, isFeatured, isOccasion, isPromo, isActive } = req.body;
 
   const categoryExists = await Category.findOne({ name });
 
@@ -18,6 +18,11 @@ const createCategory = asyncHandler(async (req, res) => {
     name,
     parent: parent || null,
     image,
+    promoImage,
+    isFeatured,
+    isOccasion,
+    isPromo,
+    isActive: isActive !== undefined ? isActive : true,
     slug: name.toLowerCase().replace(/ /g, '-'), // Simple slug generation
   });
 
@@ -50,8 +55,11 @@ const updateCategory = asyncHandler(async (req, res) => {
   category.image = req.body.image !== undefined ? req.body.image : category.image;
   category.isActive = req.body.isActive !== undefined ? req.body.isActive : category.isActive;
   category.isFeatured = req.body.isFeatured !== undefined ? req.body.isFeatured : category.isFeatured;
+  category.isOccasion = req.body.isOccasion !== undefined ? req.body.isOccasion : category.isOccasion;
+  category.isPromo = req.body.isPromo !== undefined ? req.body.isPromo : category.isPromo;
+  category.promoImage = req.body.promoImage !== undefined ? req.body.promoImage : category.promoImage;
   category.featuredProduct = req.body.featuredProduct !== undefined ? req.body.featuredProduct : category.featuredProduct;
-  
+
   if (req.body.name) {
     category.slug = req.body.name.toLowerCase().replace(/ /g, '-');
   }
