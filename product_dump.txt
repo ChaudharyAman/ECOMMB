@@ -1,4 +1,0 @@
---- ALL PRODUCTS ---
-ID: 6980b71e719b1834854a6664 | Name: demo | Status: approved
-ID: 69818f953d0ab89d310cb41c | Name: demo name  | Status: approved
-ID: 6981b3341decafc50683fd9e | Name: demo demo again | Status: pending
