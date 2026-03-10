@@ -5,7 +5,18 @@ const Category = require('../models/Category');
 // @route   POST /api/categories
 // @access  Private/Admin
 const createCategory = asyncHandler(async (req, res) => {
-  const { name, parent, image, promoImage, isFeatured, isOccasion, isPromo, isActive } = req.body;
+  const { name, parent, isFeatured, isOccasion, isPromo, isActive } = req.body;
+  let { image, promoImage } = req.body;
+
+  // Handle uploaded files from Cloudinary via middleware
+  if (req.files) {
+    if (req.files.imageFile && req.files.imageFile[0]) {
+      image = req.files.imageFile[0].path;
+    }
+    if (req.files.promoImageFile && req.files.promoImageFile[0]) {
+      promoImage = req.files.promoImageFile[0].path;
+    }
+  }
 
   const categoryExists = await Category.findOne({ name });
 
@@ -14,16 +25,19 @@ const createCategory = asyncHandler(async (req, res) => {
     throw new Error('Category already exists');
   }
 
+  // Robust boolean conversion for multipart/form-data
+  const toBool = (val) => val === 'true' || val === true;
+
   const category = await Category.create({
     name,
-    parent: parent || null,
+    parent: (parent === '' || parent === 'null' || !parent) ? null : parent,
     image,
     promoImage,
-    isFeatured,
-    isOccasion,
-    isPromo,
-    isActive: isActive !== undefined ? isActive : true,
-    slug: name.toLowerCase().replace(/ /g, '-'), // Simple slug generation
+    isFeatured: toBool(isFeatured),
+    isOccasion: toBool(isOccasion),
+    isPromo: toBool(isPromo),
+    isActive: isActive !== undefined ? toBool(isActive) : true,
+    slug: name.toLowerCase().replace(/ /g, '-'),
   });
 
   res.status(201).json(category);
@@ -50,15 +64,39 @@ const updateCategory = asyncHandler(async (req, res) => {
     throw new Error('Category not found');
   }
 
+  // Robust boolean conversion for multipart/form-data
+  const toBool = (val) => val === 'true' || val === true;
+
   category.name = req.body.name || category.name;
-  category.parent = req.body.parent !== undefined ? req.body.parent : category.parent;
-  category.image = req.body.image !== undefined ? req.body.image : category.image;
-  category.isActive = req.body.isActive !== undefined ? req.body.isActive : category.isActive;
-  category.isFeatured = req.body.isFeatured !== undefined ? req.body.isFeatured : category.isFeatured;
-  category.isOccasion = req.body.isOccasion !== undefined ? req.body.isOccasion : category.isOccasion;
-  category.isPromo = req.body.isPromo !== undefined ? req.body.isPromo : category.isPromo;
-  category.promoImage = req.body.promoImage !== undefined ? req.body.promoImage : category.promoImage;
+  
+  if (req.body.parent !== undefined) {
+    category.parent = (req.body.parent === '' || req.body.parent === 'null' || !req.body.parent) ? null : req.body.parent;
+  }
+
+  if (req.body.isActive !== undefined) category.isActive = toBool(req.body.isActive);
+  if (req.body.isFeatured !== undefined) category.isFeatured = toBool(req.body.isFeatured);
+  if (req.body.isOccasion !== undefined) category.isOccasion = toBool(req.body.isOccasion);
+  if (req.body.isPromo !== undefined) category.isPromo = toBool(req.body.isPromo);
+  
   category.featuredProduct = req.body.featuredProduct !== undefined ? req.body.featuredProduct : category.featuredProduct;
+
+  // Handle uploaded files
+  if (req.files) {
+    if (req.files.imageFile && req.files.imageFile[0]) {
+      category.image = req.files.imageFile[0].path;
+    }
+    if (req.files.promoImageFile && req.files.promoImageFile[0]) {
+      category.promoImage = req.files.promoImageFile[0].path;
+    }
+  }
+
+  // Fallback to URL if no file uploaded but URL provided
+  if (req.body.image !== undefined && (!req.files || !req.files.imageFile)) {
+    category.image = req.body.image;
+  }
+  if (req.body.promoImage !== undefined && (!req.files || !req.files.promoImageFile)) {
+    category.promoImage = req.body.promoImage;
+  }
 
   if (req.body.name) {
     category.slug = req.body.name.toLowerCase().replace(/ /g, '-');
