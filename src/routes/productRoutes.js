@@ -7,7 +7,8 @@ const {
   updateProduct,
   deleteProduct,
   submitProduct,
-  getVendorProducts
+  getVendorProducts,
+  createProductReview
 } = require('../controllers/productController');
 const { protect, authorize } = require('../middlewares/authMiddleware');
 
@@ -25,5 +26,7 @@ router.route('/:id')
   .delete(protect, authorize('vendor', 'admin'), deleteProduct);
 
 router.route('/:id/submit').put(protect, authorize('vendor'), submitProduct);
+
+router.route('/:id/reviews').post(protect, upload.single('image'), createProductReview);
 
 module.exports = router;

@@ -33,6 +33,13 @@ const userSchema = mongoose.Schema(
     avatar: {
       type: String,
     },
+    dob: {
+      type: Date,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+    },
     addresses: [
       {
         street: String,

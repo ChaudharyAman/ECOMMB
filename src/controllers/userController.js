@@ -10,7 +10,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
-    user.avatar = req.body.avatar || user.avatar;
+    user.avatar = req.file ? req.file.path : (req.body.avatar || user.avatar);
+    user.phone = req.body.phone || user.phone;
+    user.gender = req.body.gender || user.gender;
+    user.dob = req.body.dob || user.dob;
+
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
 
     const updatedUser = await user.save();
 
@@ -21,6 +28,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       phone: updatedUser.phone,
       role: updatedUser.role,
       avatar: updatedUser.avatar,
+      gender: updatedUser.gender,
+      dob: updatedUser.dob,
     });
   } else {
     res.status(404);
