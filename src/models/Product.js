@@ -5,15 +5,27 @@ const reviewSchema = mongoose.Schema(
     name: { type: String, required: true },
     rating: { type: Number, required: true },
     comment: { type: String, required: true },
-    image: {
-      public_id: String,
-      url: String,
-    },
+    images: [
+      {
+        public_id: String,
+        url: String,
+      }
+    ],
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
+    helpful: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      }
+    ],
+    verified: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

@@ -309,11 +309,13 @@ const createProductReview = asyncHandler(async (req, res) => {
       user: req.user._id,
     };
 
-    if (req.file) {
-      review.image = {
-        url: req.file.path,
-        public_id: req.file.filename,
-      };
+    if (req.files && req.files.length > 0) {
+      review.images = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
+    } else {
+      review.images = [];
     }
 
     product.reviews.push(review);
@@ -332,6 +334,42 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Toggle helpful vote on a review
+// @route   PUT /api/products/:id/reviews/:reviewId/helpful
+// @access  Private
+const toggleReviewHelpful = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (product) {
+    const review = product.reviews.find(
+      (r) => r._id.toString() === req.params.reviewId
+    );
+
+    if (review) {
+      const alreadyHelpful = review.helpful.find(
+        (id) => id.toString() === req.user._id.toString()
+      );
+
+      if (alreadyHelpful) {
+        review.helpful = review.helpful.filter(
+          (id) => id.toString() !== req.user._id.toString()
+        );
+      } else {
+        review.helpful.push(req.user._id);
+      }
+
+      await product.save();
+      res.json({ message: 'Helpful vote toggled', helpfulCount: review.helpful.length });
+    } else {
+      res.status(404);
+      throw new Error('Review not found');
+    }
+  } else {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+});
+
 module.exports = {
   getProducts,
   getProductById,
@@ -341,4 +379,5 @@ module.exports = {
   submitProduct,
   getVendorProducts,
   createProductReview,
+  toggleReviewHelpful,
 };
