@@ -2,10 +2,14 @@ const mongoose = require('mongoose');
 
 const visitorSchema = mongoose.Schema(
   {
-    ipAddress: {
+    visitorId: {
       type: String,
       required: true,
-      unique: true, // We track unique IPs. In a more complex setup, we might use session IDs.
+      unique: true, 
+    },
+    ipAddress: {
+      type: String,
+      required: true, // we still require it for logging but it's no longer uniquely identifying the visitor 
     },
     userAgent: {
       type: String,
