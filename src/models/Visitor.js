@@ -18,6 +18,10 @@ const visitorSchema = mongoose.Schema(
       type: Number,
       default: 1,
     },
+    location: {
+      type: String,
+      default: 'Unknown',
+    },
   },
   {
     timestamps: true,

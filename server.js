@@ -39,9 +39,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/visitors', visitorRoutes);
 
-// General visitor tracking (applied after specific api routes, or before depending on preference. Let's do it generally)
-app.use(trackVisitor);
-
 app.get('/', (req, res) => {
   res.send('Server running...');
 });
