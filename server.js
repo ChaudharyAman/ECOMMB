@@ -12,6 +12,8 @@ const cartRoutes = require('./src/routes/cartRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const vendorRoutes = require('./src/routes/vendorRoutes');
+const visitorRoutes = require('./src/routes/visitorRoutes');
+const { trackVisitor } = require('./src/middlewares/visitorTracking');
 
 dotenv.config();
 
@@ -35,6 +37,10 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/vendors', vendorRoutes);
+app.use('/api/visitors', visitorRoutes);
+
+// General visitor tracking (applied after specific api routes, or before depending on preference. Let's do it generally)
+app.use(trackVisitor);
 
 app.get('/', (req, res) => {
   res.send('Server running...');
