@@ -99,6 +99,22 @@ const sendOTP = asyncHandler(async (req, res) => {
   // In production, integrate SMS API here
   console.log(`OTP for ${phone}: ${otp}`);
 
+  // Fetch the user linked to the phone and send OTP to their email if registered
+  const user = await User.findOne({ phone });
+  if (user && user.email) {
+    try {
+      const emailService = require('../services/emailService');
+
+      await emailService.sendOTPEmail({
+        email: user.email,
+        otp,
+        name: user.name || 'User',
+      });
+    } catch (emailError) {
+      console.error('Failed to send OTP verification email:', emailError);
+    }
+  }
+
   res.status(200).json({ message: 'OTP sent successfully' });
 });
 

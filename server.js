@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+dotenv.config();
+require('./src/services/emailService');
+
 const connectDB = require('./src/config/db');
 const { errorHandler } = require('./src/middlewares/errorHandler');
 
@@ -10,12 +14,13 @@ const productRoutes = require('./src/routes/productRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
+const paymentRoutes = require('./src/routes/paymentRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const vendorRoutes = require('./src/routes/vendorRoutes');
 const visitorRoutes = require('./src/routes/visitorRoutes');
+const couponRoutes = require('./src/routes/couponRoutes');
+const { xssSanitizer } = require('./src/middlewares/securityMiddleware');
 const { trackVisitor } = require('./src/middlewares/visitorTracking');
-
-dotenv.config();
 
 connectDB();
 
@@ -24,8 +29,22 @@ const PORT = process.env.PORT || 5000;
 
 const path = require('path');
 
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+app.use(cors({ 
+  origin: (origin, cb) => { 
+    if(!origin || process.env.NODE_ENV==='development' || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Not allowed by CORS'));
+    }
+  }, 
+  credentials: true, 
+  methods: ['GET','POST','PUT','DELETE','PATCH'], 
+  allowedHeaders: ['Content-Type','Authorization'] 
+}));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(xssSanitizer);
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
@@ -35,9 +54,11 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/visitors', visitorRoutes);
+app.use('/api/coupons', couponRoutes);
 
 app.get('/', (req, res) => {
   res.send('Server running...');

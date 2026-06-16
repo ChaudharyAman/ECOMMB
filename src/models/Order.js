@@ -65,6 +65,56 @@ const orderSchema = mongoose.Schema(
     deliveredAt: {
       type: Date,
     },
+    trackingNumber: {
+      type: String,
+    },
+    courierName: {
+      type: String,
+    },
+    estimatedDelivery: {
+      type: Date,
+    },
+    cancelReason: {
+      type: String,
+    },
+    couponCode: {
+      type: String,
+    },
+    couponDiscount: {
+      type: Number,
+      default: 0,
+    },
+    returnRequest: {
+      requested: {
+        type: Boolean,
+        default: false,
+      },
+      reason: {
+        type: String,
+      },
+      status: {
+        type: String,
+        enum: ['none', 'pending', 'approved', 'rejected'],
+        default: 'none',
+      },
+      requestedAt: {
+        type: Date,
+      },
+    },
+    statusHistory: [
+      {
+        status: {
+          type: String,
+        },
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+        note: {
+          type: String,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
